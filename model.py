@@ -10,9 +10,15 @@ def download_model(bucket, key, local_path):
     s3.download_file(bucket, key, local_path)
 
 
-def get_model(model_location):
-    with open(model_location + os.sep + 'lin_reg.bin', 'rb') as f_in:
+def get_model(bucket, key):
+    local_path = '/tmp/lin_reg.bin'
+
+    # Download the model artifact from S3 to the local temporary directory
+    download_model(bucket, key, local_path)
+
+    with open(local_path, 'rb') as f_in:
         dv, model = pickle.load(f_in)
+
     return dv, model
 
 
@@ -86,8 +92,13 @@ def create_kinesis_client():
     return boto3.client('kinesis', endpoint_url='http://kinesis:4566')
 
 
-def init(prediction_stream_name: str = '', test_run: bool = True, model_location: str = 'model'):
-    model = get_model(model_location)
+def init(
+    prediction_stream_name: str = '',
+    test_run: bool = True,
+    model_bucket: str = '',
+    model_key: str = 'lin_reg.bin'
+):
+    model = get_model(model_bucket, model_key)
 
     callbacks = []
 

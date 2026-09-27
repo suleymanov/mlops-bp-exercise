@@ -1,10 +1,12 @@
+import os
 from pathlib import Path
 
 import model
 
 
 def test_prepare_features():
-    model_service = model.init()
+    # model_service = model.init()
+    model_service = model.init(model_bucket=os.getenv('MODEL_BUCKET'))
 
     ride = {
         "PULocationID": 130,
@@ -44,7 +46,8 @@ def test_base64_decode():
 
 
 def test_lambda_handler():
-    model_service = model.init()
+    # model_service = model.init()
+    model_service = model.init(model_bucket=os.getenv('MODEL_BUCKET'))
     model_version = "123"
     base64_input = read_text('data.b64')
     event = {
