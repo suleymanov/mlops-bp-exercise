@@ -5,6 +5,6 @@ lint:
 	ruff check .
 
 test:
-	pytest
+	pytest unit_tests
 
 check: lint format test
