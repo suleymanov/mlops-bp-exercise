@@ -1,27 +1,29 @@
 # pylint: disable=duplicate-code
 
-import os
 import json
+import os
 from pprint import pprint
 
 import boto3
 from deepdiff import DeepDiff
 
-kinesis_endpoint = os.getenv('KINESIS_ENDPOINT_URL', "http://localhost:4566")
+kinesis_endpoint = os.getenv("KINESIS_ENDPOINT_URL", "http://localhost:4566")
 # kinesis_client = boto3.client('kinesis', endpoint_url=kinesis_endpoint)
-kinesis_client = boto3.client('kinesis', endpoint_url=kinesis_endpoint, region_name='eu-west-1')
+kinesis_client = boto3.client(
+    "kinesis", endpoint_url=kinesis_endpoint, region_name="eu-west-1"
+)
 
-stream_name = os.getenv('PREDS_STREAM_NAME', 'output-stream')
-shard_id = 'shardId-000000000000'
+stream_name = os.getenv("PREDS_STREAM_NAME", "output-stream")
+shard_id = "shardId-000000000000"
 
 
 shard_iterator_response = kinesis_client.get_shard_iterator(
     StreamName=stream_name,
     ShardId=shard_id,
-    ShardIteratorType='TRIM_HORIZON',
+    ShardIteratorType="TRIM_HORIZON",
 )
 
-shard_iterator_id = shard_iterator_response['ShardIterator']
+shard_iterator_id = shard_iterator_response["ShardIterator"]
 
 
 records_response = kinesis_client.get_records(
@@ -30,30 +32,30 @@ records_response = kinesis_client.get_records(
 )
 
 
-records = records_response['Records']
+records = records_response["Records"]
 pprint(records)
 
 
 assert len(records) == 1
 
 
-actual_record = json.loads(records[0]['Data'])
+actual_record = json.loads(records[0]["Data"])
 pprint(actual_record)
 
 expected_record = {
-    'model': 'ride_duration_prediction_model',
-    'version': '123',
-    'prediction': {
-        'ride_duration': 12.3,
-        'ride_id': 156,
+    "model": "ride_duration_prediction_model",
+    "version": "123",
+    "prediction": {
+        "ride_duration": 12.3,
+        "ride_id": 156,
     },
 }
 
 diff = DeepDiff(actual_record, expected_record, significant_digits=1)
-print(f'diff={diff}')
+print(f"diff={diff}")
 
-assert 'values_changed' not in diff
-assert 'type_changes' not in diff
+assert "values_changed" not in diff
+assert "type_changes" not in diff
 
 
-print('all good')
+print("all good")
