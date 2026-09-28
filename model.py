@@ -1,5 +1,6 @@
 import base64
 import json
+import os
 import pickle
 
 import boto3
@@ -86,7 +87,12 @@ class KinesisCallback:
 
 
 def create_kinesis_client():
-    return boto3.client("kinesis", endpoint_url="http://kinesis:4566")
+    endpoint_url = os.getenv("KINESIS_ENDPOINT_URL")
+
+    if endpoint_url:
+        return boto3.client("kinesis", endpoint_url=endpoint_url)
+
+    return boto3.client("kinesis")
 
 
 def init(

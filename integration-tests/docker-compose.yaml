@@ -8,6 +8,7 @@ services:
       - AWS_DEFAULT_REGION=eu-west-1
       - MODEL_BUCKET=${MODEL_BUCKET}
       - MODEL_KEY=lin_reg.bin
+      - KINESIS_ENDPOINT_URL=http://kinesis:4566
     volumes:
       # boto3 needs to refresh the AWS login cache
       - ~/.aws:/root/.aws
