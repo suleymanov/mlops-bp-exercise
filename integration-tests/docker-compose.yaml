@@ -1,0 +1,20 @@
+services:
+  backend:
+    image: ${LOCAL_IMAGE_NAME}
+    ports:
+      - "8080:8080"
+    environment:
+      - PREDS_STREAM_NAME=${PREDS_STREAM_NAME}
+      - AWS_DEFAULT_REGION=eu-west-1
+      - MODEL_BUCKET=${MODEL_BUCKET}
+      - MODEL_KEY=lin_reg.bin
+    volumes:
+      # boto3 needs to refresh the AWS login cache
+      - ~/.aws:/root/.aws
+
+  kinesis:
+    image: localstack/localstack:3.8
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=kinesis
