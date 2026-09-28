@@ -4,12 +4,24 @@ on:
   push:
   pull_request:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      MODEL_BUCKET: mlops-zoomcamp-my-code-1790549480
+
     steps:
       - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::539850719165:role/mlops-bp-role
+          aws-region: us-east-1
 
       - uses: actions/setup-python@v5
         with:
