@@ -43,7 +43,7 @@ resource "aws_lambda_function" "model" {
   role          = aws_iam_role.lambda.arn
 
   package_type = "Image"
-  image_uri    = "${aws_ecr_repository.lambda.repository_url}:latest"
+  image_uri    = "${aws_ecr_repository.lambda.repository_url}@${data.aws_ecr_image.lambda.image_digest}"
 
   architectures = ["arm64"]
 
@@ -117,8 +117,14 @@ resource "aws_iam_role_policy" "lambda_kinesis" {
 }
 
 resource "aws_lambda_event_source_mapping" "kinesis" {
-  event_source_arn  = aws_kinesis_stream.input.arn
-  function_name     = aws_lambda_function.model.arn
-  starting_position = "LATEST"
-  batch_size        = 1
+  event_source_arn       = aws_kinesis_stream.input.arn
+  function_name          = aws_lambda_function.model.arn
+  starting_position      = "LATEST"
+  batch_size             = 1
+  maximum_retry_attempts = 0
+}
+
+data "aws_ecr_image" "lambda" {
+  repository_name = aws_ecr_repository.lambda.name
+  image_tag       = "latest"
 }
