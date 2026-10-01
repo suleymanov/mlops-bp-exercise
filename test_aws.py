@@ -3,7 +3,6 @@ import time
 
 import boto3
 
-
 REGION = "us-east-1"
 INPUT_STREAM = "input-stream"
 OUTPUT_STREAM = "output-stream"
