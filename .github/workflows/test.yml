@@ -33,6 +33,7 @@ jobs:
 
   build:
     needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     permissions:
@@ -59,3 +60,31 @@ jobs:
           provenance: false
           outputs: type=registry,oci-mediatypes=false
           tags: 539850719165.dkr.ecr.us-east-1.amazonaws.com/stream-model-duration:latest
+
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::539850719165:role/mlops-bp-role
+          aws-region: us-east-1
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform apply
+        working-directory: terraform
+        run: terraform apply -auto-approve

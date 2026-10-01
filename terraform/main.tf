@@ -1,4 +1,11 @@
 terraform {
+  backend "s3" {
+    bucket       = "mlops-zoomcamp-my-code-1790549480"
+    key          = "terraform/terraform.tfstate"
+    region       = "us-east-1"
+    use_lockfile = true
+  }
+  
   required_providers {
     aws = {
       source = "hashicorp/aws"
@@ -12,10 +19,18 @@ provider "aws" {
 
 resource "aws_s3_bucket" "model" {
   bucket = "mlops-zoomcamp-my-code-1790549480"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_ecr_repository" "lambda" {
   name = "stream-model-duration"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_iam_role" "lambda" {
